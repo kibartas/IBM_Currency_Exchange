@@ -1,6 +1,5 @@
 import Express, { Request, Response } from 'express';
-import {fetchCurrencyList, fetchCurrencyRates} from './api';
-import {TP} from './types/queryParameters';
+import {fetchCurrencyList} from './api';
 import {init} from './startup';
 import dotenv from 'dotenv';
 import {findAllCurrencies, findFxRates} from './db/utils';
@@ -10,6 +9,7 @@ import bodyParser from 'body-parser';
 import {IRequestBody} from './types/requestBody';
 import {convertMoney} from './utils/currencyExchangeCalculator';
 import {IFxRate} from './db/models/fxRate';
+import * as path from 'path';
 
 const app = Express();
 
@@ -23,8 +23,7 @@ app.get('/api/currencies', async (req: Request, res: Response): Promise<void> =>
   res.send(response);
 });
 
-app.get('/list', async (req: Request, res: Response) => {
-  res.status(200);
+app.get('/api/fxRates', async (req: Request, res: Response): Promise<void> => {
   const response = await fetchCurrencyList();
   res.send(response);
 })
@@ -55,7 +54,13 @@ app.post('/api/exchange', async (req: Request, res: Response): Promise<void> => 
   res.send(response);
 });
 
-const port = process.env.port || 8080;
+app.use(Express.static(path.join(__dirname, 'build')));
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
   await init();
