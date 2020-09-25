@@ -7,7 +7,7 @@ export type IFxRate = {
   to_amt: number
 }
 
-export const FxRate: Schema = new Schema({
+const FxRateSchema: Schema = new Schema({
   ccy_from: {
     required: true,
     type: String
@@ -26,4 +26,4 @@ export const FxRate: Schema = new Schema({
   }
 });
 
-export default model<IFxRate & Document>('fxRate', FxRate);
+export default model<IFxRate & Document>('fxRate', FxRateSchema);

@@ -4,7 +4,7 @@ export type ICurrency = {
   currencies: string[]
 };
 
-export const Currencies: Schema = new Schema<ICurrency>({
+const Currencies: Schema = new Schema<ICurrency>({
   currencies: {
     type: [{
       type: String

@@ -2,7 +2,7 @@ import {ICurrency} from '../db/models/currency';
 import {IFxRate} from '../db/models/fxRate';
 
 export const rawFxRatesToCurrencies = async (rawFxRates: any): Promise<ICurrency> => {
-  // "EUR" is not in any FxRates.FxRate.[].CcyAmt[1].Ccy and it's the base currency in this converter
+  // "EUR" is not in any FxRates.FxRateSchema.[].CcyAmt[1].Ccy and it's the base currency in this converter
   return { currencies: ["EUR", ...rawFxRates.FxRates.FxRate.map(
       (elem: any): string => elem.CcyAmt[1].Ccy )] };
 };

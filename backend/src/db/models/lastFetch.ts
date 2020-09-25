@@ -4,9 +4,9 @@ export type ILastFetch = {
   lastFetch: Date
 };
 
-export const lastFetch = new Schema({
+const LastFetchSchema = new Schema({
   lastFetch: Date
 });
 
-export default model<ILastFetch & Document>('lastFetch', lastFetch);
+export default model<ILastFetch & Document>('lastFetch', LastFetchSchema);
 
