@@ -107,7 +107,7 @@ function App() {
                 required
                 value={amt}
                 type="text"
-                maxLength={1000}
+                maxLength={17}
                 placeholder="f.e. 12.23"
                 onKeyPress={(event) => {
                   if (!((event.key >= '0' && event.key <= '9') || event.key === '.')) {
