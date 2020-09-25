@@ -1,6 +1,6 @@
 import Express, { Request, Response } from 'express';
 import {fetchCurrencyList} from './api';
-import {init} from './startup';
+import {init} from './startup/startup';
 import dotenv from 'dotenv';
 import {findAllCurrencies, findFxRates} from './db/utils';
 import cors from 'cors';
