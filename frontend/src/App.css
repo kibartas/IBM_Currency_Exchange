@@ -9,3 +9,23 @@
     font-size: calc(10px + 2vmin);
     color: white;
 }
+
+.error {
+    color: red;
+    margin-bottom: 30px;
+}
+
+.textFields {
+    margin-bottom: 20px;
+}
+
+.label-input {
+    display: flex;
+    flex-direction: column;
+}
+
+.result {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 50px;
+}
