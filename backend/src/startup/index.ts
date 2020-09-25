@@ -67,6 +67,13 @@ const initDbInformation = async (): Promise<void> => {
       await found.save();
     }
   }
+  const EURtoEUR: IFxRate = {
+    ccy_from: "EUR",
+    ccy_to: "EUR",
+    from_amt: 1,
+    to_amt: 1
+  };
+  await new FxRateModel(EURtoEUR).save();
 };
 
 export const init = async (): Promise<void> => {
