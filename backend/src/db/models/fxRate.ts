@@ -1,10 +1,10 @@
 import {Document, model, Schema, Types} from 'mongoose';
 
 export type IFxRate = {
-  ccy_from: String,
-  from_amt: Number,
-  ccy_to: String,
-  to_amt: Number
+  ccy_from: string,
+  from_amt: number,
+  ccy_to: string,
+  to_amt: number
 }
 
 export const FxRate: Schema = new Schema({
