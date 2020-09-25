@@ -1,3 +1,19 @@
-import { Schema } from 'mongoose';
+import {model, Schema, Document} from 'mongoose';
 
-const a = () => {};
+export interface IUser {
+  IP: string;
+  timestamp: Date;
+}
+
+const UserSchema = new Schema({
+  IP: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    required: true
+  }
+});
+
+export default model<IUser & Document>('user', UserSchema);
