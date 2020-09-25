@@ -12,13 +12,17 @@ import {convertMoney} from './utils/currencyExchangeCalculator';
 import {IFxRate} from './db/models/fxRate';
 import * as path from 'path';
 import {scheduleDBRePopulation} from './utils/jobScheduler';
+import {userLogger} from './middleware/userLogger';
 
 const app = Express();
 
 dotenv.config();
 
+app.set('trust proxy', true);
+
 app.use(cors());
 app.use(bodyParser.json());
+app.use(userLogger);
 
 app.get('/api/currencies', async (req: Request, res: Response): Promise<void> => {
   const response = await findAllCurrencies();
@@ -63,7 +67,6 @@ app.get('/*', (req, res) => {
 });
 
 const port = process.env.PORT || 8080;
-
 
 app.listen(port, async () => {
   await init();
