@@ -45,13 +45,19 @@ const getFxRates = async (rawFxRates: any): Promise<IFxRate[]> => {
   }));
 };
 
-const initDbInformation = async (rawFxRates: any) => {
+const initDbInformation = async (): Promise<void> => {
+  let rawFxRates: any;
+  try {
+    rawFxRates = await fetchCurrencyRates();
+  } catch {
+    //TODO: real error handling
+    console.error("Unable to fetch currency rates");
+  }
   const currencies = await getCurrencies(rawFxRates);
   await insertCurrencies(currencies.currencies);
   await LastFetchModel.updateOne({}, { lastFetch: new Date(Date.now()) });
   //////////////////////////////////
   const FxRateModels: IFxRate[] = await getFxRates(rawFxRates);
-  console.log(FxRateModels);
   for (const fxrate of FxRateModels) {
     const found: IFxRate & Document | null = await FxRateModel.findOne({ ccy_to: fxrate.ccy_to });
     if (found === null) {
@@ -72,16 +78,11 @@ export const init = async (): Promise<void> => {
     process.exit(1);
   }
   let lastFetch: ILastFetch | null = await LastFetchModel.findOne({});
-  if (lastFetch === null) {
+  if (lastFetch === null || lastFetch.lastFetch.getDay() !== new Date().getDay()) {
+    await initDbInformation();
     await new LastFetchModel({ lastFetch: Date.now() }).save();
-  } else if (lastFetch.lastFetch.getDay() === new Date().getDay()) {
-    console.log(lastFetch.lastFetch);
   } else {
-    let rawFxRates: any;
-    try {
-      rawFxRates = await fetchCurrencyRates();
-    } catch {
-      console.error("Unable to fetch currency rates");
-    }
+    console.log(lastFetch.lastFetch);
+    //TODO: scheduled re-fetching
   }
 };
