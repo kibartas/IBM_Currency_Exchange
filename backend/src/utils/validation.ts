@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {IRequestBody} from '../types/requestBody';
-import {findAllCurrencies} from '../db/utils';
+import {findAllCurrencies} from '../db/services/currencies';
 
 const numberValidationRegex = /^\d{1,20}(?:\.\d{1,5})?$/;
 

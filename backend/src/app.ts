@@ -1,15 +1,17 @@
 import Express, { Request, Response } from 'express';
-import {fetchCurrencyList} from './api';
-import {init} from './startup/startup';
+import {fetchCurrencyList} from './api/api';
+import {init} from './utils/startup';
 import dotenv from 'dotenv';
-import {findAllCurrencies, findFxRates} from './db/utils';
+import { findAllCurrencies } from './db/services/currencies';
+import { findFxRates } from './db/services/fxRates';
 import cors from 'cors';
-import {validateRequest} from './validation';
+import {validateRequest} from './utils/validation';
 import bodyParser from 'body-parser';
 import {IRequestBody} from './types/requestBody';
 import {convertMoney} from './utils/currencyExchangeCalculator';
 import {IFxRate} from './db/models/fxRate';
 import * as path from 'path';
+import {scheduleDBRePopulation} from './utils/jobScheduler';
 
 const app = Express();
 
@@ -62,7 +64,9 @@ app.get('/*', (req, res) => {
 
 const port = process.env.PORT || 8080;
 
+
 app.listen(port, async () => {
   await init();
+  scheduleDBRePopulation();
   console.log(`Listening at port ${port}`);
 });
