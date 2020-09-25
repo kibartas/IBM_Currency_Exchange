@@ -10,6 +10,8 @@ interface IResult {
   toAmt: number;
 }
 
+const API_LINK = process.env.API || 'http://localhost:8080/api';
+
 function App() {
   const [fromCur, setFromCur] = useState<string>("EUR");
   const [toCur, setToCur] = useState<string>("USD");
@@ -23,7 +25,7 @@ function App() {
   useEffect(() => {
     const getCurrencies = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/currencies', { timeout: 2000 });
+        const response = await axios.get(`${API_LINK}/currencies`, { timeout: 2000 });
         setCurrencies(response.data.currencies);
       } catch {
         setFetchError("Failed to fetch information. Try again later.")
@@ -56,7 +58,7 @@ function App() {
     // post
     const postAmounts = async (): Promise<void> => {
       try {
-        const response: AxiosResponse<IResult> = await axios.post('http://localhost:8080/api/exchange', {
+        const response: AxiosResponse<IResult> = await axios.post(`${API_LINK}/exchange`, {
           "ccy_from": fromCur,
           "ccy_to": toCur,
           "amt": amt,
