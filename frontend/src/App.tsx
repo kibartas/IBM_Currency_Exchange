@@ -10,7 +10,7 @@ interface IResult {
   toAmt: number;
 }
 
-const API_LINK = process.env.API || 'http://localhost:8080/api';
+const API_LINK = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8080/api';
 
 function App() {
   const [fromCur, setFromCur] = useState<string>("EUR");
