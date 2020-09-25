@@ -1,9 +1,7 @@
 import mongoose, {Document} from 'mongoose';
-import {fetchCurrencyRates} from '../api';
-import CurrenciesModel, {ICurrency} from '../db/models/currency';
-import LastFetchModel, {ILastFetch} from '../db/models/lastFetch';
-import FxRateModel, {IFxRate} from '../db/models/fxRate';
-import initDB from '../db';
+import {fetchCurrencyRates} from './api';
+import * from './db/models';
+import initDB from './db';
 
 
 const getCurrencies = async (rawFxRates: any): Promise<ICurrency> => {
