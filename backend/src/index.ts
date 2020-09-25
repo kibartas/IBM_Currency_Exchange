@@ -3,15 +3,23 @@ import {fetchCurrencyList, fetchCurrencyRates} from './api';
 import {TP} from './types/queryParameters';
 import {init} from './startup';
 import dotenv from 'dotenv';
+import {findAllCurrencies, findFxRates} from './db/utils';
+import cors from 'cors';
+import {validateRequest} from './validation';
+import bodyParser from 'body-parser';
+import {IRequestBody} from './types/requestBody';
+import {convertMoney} from './utils/currencyExchangeCalculator';
+import {IFxRate} from './db/models/fxRate';
 
 const app = Express();
 
 dotenv.config();
 
-app.get('/rates', async (req: Request, res: Response) => {
-  res.status(200);
-  const tp: TP = req.query.tp === undefined ? 'EU' : req.query.tp as TP;
-  const response = await fetchCurrencyRates(tp);
+app.use(cors());
+app.use(bodyParser.json());
+
+app.get('/api/currencies', async (req: Request, res: Response): Promise<void> => {
+  const response = await findAllCurrencies();
   res.send(response);
 });
 
