@@ -5,12 +5,20 @@ import LastFetchModel, {ILastFetch} from '../db/models/lastFetch';
 import FxRateModel, {IFxRate} from '../db/models/fxRate';
 
 const initDB = async (): Promise<void> => {
-  await mongoose.connect(process.env.MONGO_URI as string, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  });
+  while (true) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI as string, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+      });
+      break;
+    } catch {
+      console.error("Failed to connect to DB. Retrying");
+      setTimeout(() => {}, 1000);
+    }
+  }
 };
 
 const getCurrencies = async (rawFxRates: any): Promise<ICurrencies> => {
