@@ -1,21 +1,16 @@
 import {model, Schema, Document} from 'mongoose';
 
-export type ICurrencies = { currencies: ICurrency[] };
+export type ICurrency = {
+  currencies: string[]
+};
 
-export type ICurrency = { abbreviation: String };
-
-export const Currency: Schema = new Schema<ICurrency>({
-  abbreviation: {
-    type: String,
-    required: true
-  }
-});
-
-export const Currencies: Schema = new Schema<ICurrencies>({
+export const Currencies: Schema = new Schema<ICurrency>({
   currencies: {
-    type: [Currency],
+    type: [{
+      type: String
+    }],
     required: true
   }
 });
 
-export default model<ICurrencies & Document>('currencies', Currencies);
+export default model<ICurrency & Document>('currencies', Currencies);
