@@ -1,6 +1,6 @@
 import mongoose, {Document} from 'mongoose';
 import {fetchCurrencyRates} from '../api';
-import CurrenciesModel, {ICurrencies, ICurrency} from '../db/models/currency';
+import CurrenciesModel, {ICurrency} from '../db/models/currency';
 import LastFetchModel, {ILastFetch} from '../db/models/lastFetch';
 import FxRateModel, {IFxRate} from '../db/models/fxRate';
 
@@ -21,18 +21,18 @@ const initDB = async (): Promise<void> => {
   }
 };
 
-const getCurrencies = async (rawFxRates: any): Promise<ICurrencies> => {
+const getCurrencies = async (rawFxRates: any): Promise<ICurrency> => {
   // "EUR" is not in any FxRates.FxRate.[].CcyAmt[1].Ccy and it's the base currency in this converter
-  return { currencies: [{ abbreviation: "EUR" }, ...rawFxRates.FxRates.FxRate.map(
-      (elem: any): ICurrency => ({ abbreviation: elem.CcyAmt[1].Ccy }))] };
+  return { currencies: ["EUR", ...rawFxRates.FxRates.FxRate.map(
+      (elem: any): string => elem.CcyAmt[1].Ccy )] };
 };
 
-const insertCurrencies = async (currencies: ICurrencies) => {
-  const fetchedCurrencies: ICurrencies | null = await CurrenciesModel.findOne({});
+const insertCurrencies = async (currencies: string[]) => {
+  const fetchedCurrencies: ICurrency | null = await CurrenciesModel.findOne({});
   if (fetchedCurrencies === null) {
-    await new CurrenciesModel({ currencies: currencies.currencies }).save();
+    await new CurrenciesModel({ currencies: currencies }).save();
   } else {
-    CurrenciesModel.updateOne({}, currencies.currencies);
+    CurrenciesModel.updateOne({}, { currencies: currencies });
   }
 };
 
@@ -47,7 +47,7 @@ const getFxRates = async (rawFxRates: any): Promise<IFxRate[]> => {
 
 const initDbInformation = async (rawFxRates: any) => {
   const currencies = await getCurrencies(rawFxRates);
-  await insertCurrencies(currencies);
+  await insertCurrencies(currencies.currencies);
   await LastFetchModel.updateOne({}, { lastFetch: new Date(Date.now()) });
   //////////////////////////////////
   const FxRateModels: IFxRate[] = await getFxRates(rawFxRates);
