@@ -22,7 +22,6 @@ app.set('trust proxy', true);
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(userLogger);
 
 app.get('/api/currencies', async (req: Request, res: Response): Promise<void> => {
   const response = await findAllCurrencies();
@@ -35,6 +34,7 @@ app.get('/api/fxRates', async (req: Request, res: Response): Promise<void> => {
 })
 
 app.post('/api/exchange', validateRequest);
+app.post('/api/exchange', userLogger);
 
 app.post('/api/exchange', async (req: Request, res: Response): Promise<void> => {
   type IResponse = {
