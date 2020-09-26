@@ -1,7 +1,15 @@
-import React, {FormEvent, useEffect, useState} from 'react';
-import './App.css';
-import {numberRegex} from './utils/regex';
-import axios, {AxiosResponse} from 'axios';
+import React, {ChangeEvent, useEffect, useState} from "react";
+import "./App.css";
+import axios, { AxiosResponse } from "axios";
+import { useForm, SubmitHandler, UnpackNestedValue } from "react-hook-form";
+import Header from "./components/Header";
+import ResultField from "./components/ResultField";
+import CurrencyField from "./components/CurrencyField";
+import CurrencySelect from "./components/CurrencySelect";
+import LabelInput from "./components/LabelInput/LabelInput";
+import Button from "./components/Button";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers";
 
 interface IResult {
   fromCur: string;
@@ -10,148 +18,165 @@ interface IResult {
   toAmt: number;
 }
 
-const API_LINK = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8080/api';
+export interface IForm extends Omit<IResult, "fromAmt" | "toAmt"> {
+  amt: number;
+}
+
+const API_LINK =
+  process.env.NODE_ENV === "production" ? "/api" : "http://localhost:8080/api";
 
 function App() {
+  const [currencies, setCurrencies] = useState<Array<string>>([]);
+  const [error, setError] = useState<string>("");
   const [fromCur, setFromCur] = useState<string>("EUR");
   const [toCur, setToCur] = useState<string>("USD");
-  const [amt, setAmt] = useState<string>('')
-  const [currencies, setCurrencies] = useState<Array<string>>([]);
-  const [error, setError] = useState<string>('');
-  const [fetchError, setFetchError] = useState<string>('');
-  const [result, setResult] = useState<string>('');
+  const [fetchError, setFetchError] = useState<string>("");
+  const [result, setResult] = useState<string>("");
+
+  const schema = yup.object().shape<IForm>({
+    toCur: yup
+      .string()
+      .length(3, "Must be 3 characters")
+      .typeError("Must be a string")
+      .test("disallowed-value", "Value not allowed", (value) =>
+        value ? currencies.includes(value) : true
+      )
+      .required(),
+    fromCur: yup
+      .string()
+      .typeError("Must be a string")
+      .length(3, "Must be 3 characters")
+      .notOneOf([yup.ref("toCur")], "Currencies mustn't match")
+      .test("disallowed-value", "Value not allowed", (value) =>
+        value ? currencies.includes(value) : true
+      )
+      .required(),
+    amt: yup
+      .number()
+      .typeError("a")
+      .positive("Must be a positive number")
+      .test("len", "Must be up to 16 characters long (excluding .)", (val) => {
+        if (val) return val.toString().length <= 16;
+        return false;
+      })
+      .test(
+        "two-decimal-places",
+        "Only two decimal places allowed",
+        (value) => {
+          if (value)
+            if (value.toString().includes("."))
+              return /^\d*\.\d{1,2}$/.test(value.toString());
+          return true;
+        }
+      )
+      .required(),
+  });
 
   // wrapper
   useEffect(() => {
-    const getCurrencies = async () => {
+    (async () => {
       try {
-        const response = await axios.get(`${API_LINK}/currencies`, { timeout: 2000 });
+        const response = await axios.get(`${API_LINK}/currencies`, {
+          timeout: 2000,
+        });
         setCurrencies(response.data.currencies);
       } catch {
-        setFetchError("Failed to fetch information. Try again later.")
+        setFetchError("Failed to fetch information. Try again later.");
       }
-    };
-    getCurrencies().then(() => {});
+    })();
   }, []);
 
-  const validateInputs = (): void => {
-    if (!numberRegex.test(amt)) {
-      setError('From value is invalid');
-      return;
-    } else {
-      setError('');
-    }
-    if (!currencies.includes(fromCur)) {
-      setError('1st currency value is invalid');
-      return;
-    } else setError('');
-    if (!currencies.includes(toCur)) {
-      setError('2nd currency value is invalid');
-      return;
-    } else setError('');
-    if (fromCur === toCur) {
-      setError('Currencies should not be identical');
-      return;
-    } else setError('');
-    // Valid info
+  const { handleSubmit, register, errors } = useForm<IForm>({
+    resolver: yupResolver(schema),
+  });
 
-    // post
-    const postAmounts = async (): Promise<void> => {
+  const onSubmit: SubmitHandler<IForm> = ({
+    amt,
+    fromCur,
+    toCur,
+  }: UnpackNestedValue<IForm>) => {
+    (async (): Promise<void> => {
       try {
-        const response: AxiosResponse<IResult> = await axios.post(`${API_LINK}/exchange`, {
-          "ccy_from": fromCur,
-          "ccy_to": toCur,
-          "amt": amt,
-        }, { timeout: 10000 });
+        const response: AxiosResponse<IResult> = await axios.post(
+          `${API_LINK}/exchange`,
+          {
+            ccy_from: fromCur,
+            ccy_to: toCur,
+            amt: amt,
+          },
+          { timeout: 10000 }
+        );
         const data: IResult = response.data;
-        setResult(`${data.fromAmt}${data.fromCur} is ${data.toAmt}${data.toCur}`);
+        setResult(
+          `${data.fromAmt} ${data.fromCur} is ${data.toAmt} ${data.toCur}`
+        );
       } catch (e) {
-        if (e.message.startsWith('timeout')) {
-          setError('Server is unreachable. Try again later');
+        if (e.message.startsWith("timeout")) {
+          setError("Server is unreachable. Try again later");
         }
         if (e.status === 500) {
           setError("Failed to execute calculation. Try again later");
         } else if (e.status === 400) {
-          setError("Wrong number format.")
+          setError("Wrong number format.");
         }
       }
-    };
-    postAmounts().then(() => {});
+    })();
   };
 
   if (fetchError) {
-    return <div className="App">{fetchError}</div>
+    return <div className="App">{fetchError}</div>;
   }
 
-  return currencies.length === 0 ? <div className="App">Loading</div> : (
+  return currencies.length === 0 ? (
+    <div className="App">Loading</div>
+  ) : (
     <div className="App">
-      <header className="App-header">
-        <h1>Currency exchange</h1>
-      </header>
-      <div className="error">
-        {error}
-      </div>
-      <div className="result">
-        <label>Result</label>
-        <input readOnly type="text" value={result}/>
-      </div>
-      <form onSubmit={(e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        validateInputs();
-      }} >
+      <Header />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <span className="error">{error || errors.fromCur?.message}</span>
         <div className="textFields">
-          <div className="label-input">
-            <label>From</label>
-            <div>
-              <input
-                required
-                value={amt}
-                type="text"
-                maxLength={17}
-                placeholder="f.e. 12.23"
-                onKeyPress={(event) => {
-                  if (!((event.key >= '0' && event.key <= '9') || event.key === '.')) {
-                    event.preventDefault();
-                  }
-                }}
-                onChange={(event: FormEvent<HTMLInputElement>) => setAmt(event.currentTarget.value)}
-              />
-              <select
-                required
-                value={fromCur}
-                onChange={(event) => {
-                  if (event.target.value === toCur) {
-                    setToCur(fromCur);
-                  }
-                  setFromCur(event.target.value);
-                }}
-              >
-                {currencies.length !== 0 && currencies.map((currency) => (
-                  <option key={currency} value={currency}>{currency}</option>
-                ))}
-              </select>
+          <LabelInput labelText="From">
+            <div className="input-select">
+            <div className="input-error">
+              <CurrencyField name="amt" register={register} />
+              <span className="error">{errors.amt?.message}</span>
             </div>
-          </div>
-          <div className="label-input">
-            <label>To</label>
-            <select
-              required
+              <div className="input-error">
+                <CurrencySelect
+                  register={register}
+                  name="fromCur"
+                  currencies={currencies}
+                  value={fromCur}
+                  onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
+                    if (event.target.value === toCur) {
+                      setToCur(fromCur);
+                    }
+                    setFromCur(event.target.value);
+                  }}
+                />
+              </div>
+            </div>
+          </LabelInput>
+          <LabelInput labelText={"To"}>
+            <CurrencySelect
+              register={register}
+              name="toCur"
+              currencies={currencies}
               value={toCur}
-              onChange={(event) => {
+              onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
+                console.log(event.target.value, toCur)
                 if (event.target.value === fromCur) {
                   setFromCur(toCur);
                 }
-                setToCur(event.target.value)
+                setToCur(event.target.value);
               }}
-            >
-              {currencies.length !== 0 && currencies.map((currency) => (
-                <option key={currency} value={currency}>{currency}</option>
-              ))}
-            </select>
-          </div>
+            />
+            <p>{errors.toCur?.message}</p>
+          </LabelInput>
         </div>
-          <button type="submit">Submit</button>
+        <Button type="submit" text="Submit" />
       </form>
+      <ResultField result={result} />
     </div>
   );
 }
