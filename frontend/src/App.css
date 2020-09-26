@@ -15,17 +15,26 @@
     margin-bottom: 30px;
 }
 
-.textFields {
-    margin-bottom: 20px;
-}
-
 .label-input {
     display: flex;
     flex-direction: column;
 }
 
 .result {
+    margin-top: 15px;
+}
+
+.input-select {
+    display: flex;
+    flex-direction: row;
+}
+
+.input-error {
     display: flex;
     flex-direction: column;
-    margin-bottom: 50px;
+}
+
+.error {
+    color: red;
+    font-size: 30px;
 }
