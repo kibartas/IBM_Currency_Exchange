@@ -33,8 +33,8 @@ app.get('/api/fxRates', async (req: Request, res: Response): Promise<void> => {
   res.send(response);
 })
 
-app.post('/api/exchange', validateRequest);
 app.post('/api/exchange', userLogger);
+app.post('/api/exchange', validateRequest);
 
 app.post('/api/exchange', async (req: Request, res: Response): Promise<void> => {
   type IResponse = {

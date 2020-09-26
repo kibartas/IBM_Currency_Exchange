@@ -11,7 +11,7 @@ export const userLogger = async (
   await insertUser({
     IP: req.ip,
     timestamp: new Date(Date.now()),
-    action: `Change ${body.amt} ${body.ccy_from} to ${body.ccy_to}`,
+    action: `Change ${body?.amt.toString()} ${body?.ccy_from.toString()} to ${body?.ccy_to.toString()}`,
   });
   next();
 };
