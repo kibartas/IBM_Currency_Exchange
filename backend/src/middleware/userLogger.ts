@@ -1,7 +1,17 @@
-import {NextFunction, Request, Response} from 'express';
-import {insertUser} from '../db/services/users';
+import { NextFunction, Request, Response } from "express";
+import { insertUser } from "../db/services/users";
+import { IRequestBody } from "../types/requestBody";
 
-export const userLogger = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  await insertUser({ IP: req.ip, timestamp: new Date(Date.now()) });
+export const userLogger = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const body: IRequestBody = req.body;
+  await insertUser({
+    IP: req.ip,
+    timestamp: new Date(Date.now()),
+    action: `Change ${body.amt} ${body.ccy_from} to ${body.ccy_to}`,
+  });
   next();
 };

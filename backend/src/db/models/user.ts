@@ -3,6 +3,7 @@ import {model, Schema, Document} from 'mongoose';
 export interface IUser {
   IP: string;
   timestamp: Date;
+  action: string;
 }
 
 const UserSchema = new Schema({
@@ -12,6 +13,10 @@ const UserSchema = new Schema({
   },
   timestamp: {
     type: Date,
+    required: true
+  },
+  action: {
+    type: String,
     required: true
   }
 });
