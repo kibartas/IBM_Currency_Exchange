@@ -1,4 +1,0 @@
-build:
-  docker:
-    frontend: ./frontend/Production.Dockerfile
-    backend: ./backend/Production.Dockerfile
