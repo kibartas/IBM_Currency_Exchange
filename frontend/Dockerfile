@@ -7,7 +7,6 @@ WORKDIR /frontend
 COPY package.json yarn.lock /frontend/
 
 RUN yarn
-
 COPY . /frontend/
 
 EXPOSE 3000
