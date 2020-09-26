@@ -6,11 +6,11 @@ WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
 
-COPY ../package.json yarn.lock /app/
+COPY package.json yarn.lock /app/
 
 RUN yarn
 
-COPY .. /app/
+COPY . /app/
 
 RUN yarn build
 
