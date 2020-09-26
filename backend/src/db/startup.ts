@@ -9,7 +9,7 @@ import FxRatesModel, {IFxRate} from './models/fxRate';
 export const initDB = async (): Promise<void> => {
   while (true) {
     try {
-      await mongoose.connect(process.env.MONGO_URI as string, {
+      await mongoose.connect(process.env.MONGO_URI || 'mongodb://mongodb:27017/currencies', {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
@@ -18,7 +18,7 @@ export const initDB = async (): Promise<void> => {
       break;
     } catch {
       console.error("Failed to connect to DB. Retrying");
-      setTimeout(() => {}, 1000);
+      setTimeout(() => {}, 10000);
     }
   }
 };

@@ -1,0 +1,29 @@
+version: "3"
+services:
+  backend:
+    container_name: backend
+    restart: always
+    image: kibartas/backend
+    build: backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+  frontend:
+    container_name: frontend
+    restart: always
+    image: kibartas/frontend
+    build: frontend
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    volumes:
+    - ./data:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --noauth
