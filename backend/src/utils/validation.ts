@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {IRequestBody} from '../types/requestBody';
 import {findAllCurrencies} from '../db/services/currencies';
 
-const numberValidationRegex = /^\d{1,20}(?:\.\d{1,5})?$/;
+const numberValidationRegex = /^\d{1,16}(?:\.\d{1,2})?$/;
 
 const argumentTooLarge = (res: Response) => {
   res.status(400);
@@ -12,11 +12,14 @@ const argumentTooLarge = (res: Response) => {
 
 export const validateRequest = async (req: Request, res: Response, next: NextFunction) => {
   const body: IRequestBody | undefined = req.body;
-  if (!body || !body?.amt || !body?.ccy_from || !body.ccy_to) {
+  if (!body || !body?.amt || !body?.ccy_from || !body?.ccy_to) {
     res.status(400);
     res.send("Bad request");
     return;
   }
+  body.ccy_from = body.ccy_from.toString();
+  body.ccy_to = body.ccy_to.toString();
+  body.amt = body.amt.toString();
   if (body.ccy_from.length != 3 || body.ccy_to.length != 3) {
     res.status(400);
     res.send("Invalid currencies");
