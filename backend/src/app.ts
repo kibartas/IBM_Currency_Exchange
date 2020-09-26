@@ -60,12 +60,6 @@ app.post('/api/exchange', async (req: Request, res: Response): Promise<void> => 
   res.send(response);
 });
 
-app.use(Express.static(path.join(__dirname, 'build')));
-
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
 const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
