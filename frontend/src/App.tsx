@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import "./App.css";
 import axios, { AxiosResponse } from "axios";
 import { useForm, SubmitHandler, UnpackNestedValue } from "react-hook-form";
@@ -38,7 +38,7 @@ function App() {
       .string()
       .length(3, "Must be 3 characters")
       .typeError("Must be a string")
-      .test("disallowed-value", "Value not allowed", (value) =>
+      .test("disallowed-value", "Currency not allowed", (value) =>
         value ? currencies.includes(value) : true
       )
       .required(),
@@ -47,29 +47,34 @@ function App() {
       .typeError("Must be a string")
       .length(3, "Must be 3 characters")
       .notOneOf([yup.ref("toCur")], "Currencies mustn't match")
-      .test("disallowed-value", "Value not allowed", (value) =>
+      .test("disallowed-value", "Currency not allowed", (value) =>
         value ? currencies.includes(value) : true
       )
       .required(),
     amt: yup
       .number()
-      .typeError("a")
-      .positive("Must be a positive number")
-      .test("len", "Must be up to 16 characters long (excluding .)", (val) => {
-        if (val) return val.toString().length <= 16;
-        return false;
+      .transform((cv, ov) => {
+        return ov === '' ? undefined : cv;
       })
+      .positive("Must be a positive number")
+      .test("len", "Must be not longer than 16 characters", (val) => {
+        if (val) return val.toString().length <= 16;
+        return true;
+      })
+      .nullable(true)
       .test(
         "two-decimal-places",
         "Only two decimal places allowed",
         (value) => {
-          if (value)
-            if (value.toString().includes("."))
-              return /^\d*\.\d{1,2}$/.test(value.toString());
+          if (value !== undefined && value !== null && value.toString().includes(".")) {
+            console.log("hello")
+            return /^\d*\.\d{1,2}$/.test(value.toString());
+          }
           return true;
         }
       )
-      .required(),
+      .typeError("Must be a valid number")
+      .required(""),
   });
 
   // wrapper
@@ -136,12 +141,9 @@ function App() {
         <span className="error">{error || errors.fromCur?.message}</span>
         <div className="textFields">
           <LabelInput labelText="From">
-            <div className="input-select">
             <div className="input-error">
-              <CurrencyField name="amt" register={register} />
-              <span className="error">{errors.amt?.message}</span>
-            </div>
-              <div className="input-error">
+              <div className="input-select">
+                <CurrencyField name="amt" register={register} />
                 <CurrencySelect
                   register={register}
                   name="fromCur"
@@ -155,6 +157,7 @@ function App() {
                   }}
                 />
               </div>
+              <span className="error">{errors.amt?.message}</span>
             </div>
           </LabelInput>
           <LabelInput labelText={"To"}>
@@ -164,7 +167,7 @@ function App() {
               currencies={currencies}
               value={toCur}
               onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
-                console.log(event.target.value, toCur)
+                console.log(event.target.value, toCur);
                 if (event.target.value === fromCur) {
                   setFromCur(toCur);
                 }

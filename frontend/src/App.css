@@ -27,6 +27,7 @@
 .input-select {
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 .input-error {
@@ -36,5 +37,5 @@
 
 .error {
     color: red;
-    font-size: 30px;
+    font-size: 20px;
 }

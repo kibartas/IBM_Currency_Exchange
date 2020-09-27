@@ -14,7 +14,7 @@ const CurrencyField: React.FC<IProps> = ({
       ref={register}
       required
       type="text"
-      maxLength={17}
+      maxLength={16}
       placeholder="f.e. 12.23"
       onKeyPress={(event) => {
         if (!((event.key >= "0" && event.key <= "9") || event.key === ".")) {

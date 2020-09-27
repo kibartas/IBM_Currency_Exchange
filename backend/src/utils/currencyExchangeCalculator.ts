@@ -1,19 +1,24 @@
+import { Decimal } from "decimal.js-light";
 
-// the calculations will be precise to significantDecimals decimal places
-const significantDecimals = 5;
+Decimal.config({
+  rounding: 2
+});
 
-
-const multiplyMoney = (x: number, y: number): number => {
-  const precision = Math.pow(10, significantDecimals);
-  const wholeAmount = x * precision;
-  const result = Math.floor(wholeAmount * y);
-  return result / precision;
+const multiplyMoney = (x: Decimal, y: Decimal): Decimal => {
+  return x.times(y);
 };
 
-const divideMoney = (x: number, y: number): number => {
-  return multiplyMoney(x, 1 / y);
+const divideMoney = (x: Decimal, y: Decimal): Decimal => {
+  return x.div(y);
 };
 
-export const convertMoney = (from: number, to: number, multiplyBy: number): number => {
-  return multiplyMoney(divideMoney(to, from), multiplyBy);
+export const convertMoney = (
+  from: number,
+  to: number,
+  multiplyBy: number
+): Decimal => {
+  return multiplyMoney(
+    divideMoney(new Decimal(to.toString()), new Decimal(from.toString())),
+    new Decimal(multiplyBy)
+  );
 };
