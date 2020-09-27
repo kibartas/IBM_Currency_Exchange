@@ -54,7 +54,7 @@ function App() {
     amt: yup
       .number()
       .transform((cv, ov) => {
-        return ov === '' ? undefined : cv;
+        return ov === "" ? undefined : cv;
       })
       .positive("Must be a positive number")
       .test("len", "Must be not longer than 16 characters", (val) => {
@@ -66,8 +66,11 @@ function App() {
         "two-decimal-places",
         "Only two decimal places allowed",
         (value) => {
-          if (value !== undefined && value !== null && value.toString().includes(".")) {
-            console.log("hello")
+          if (
+            value !== undefined &&
+            value !== null &&
+            value.toString().includes(".")
+          ) {
             return /^\d*\.\d{1,2}$/.test(value.toString());
           }
           return true;
@@ -167,7 +170,6 @@ function App() {
               currencies={currencies}
               value={toCur}
               onChange={(event: ChangeEvent<HTMLSelectElement>): void => {
-                console.log(event.target.value, toCur);
                 if (event.target.value === fromCur) {
                   setFromCur(toCur);
                 }
