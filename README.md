@@ -8,7 +8,7 @@
 - The [app](https://currencyxchange-ibm.herokuapp.com/) runs on Heroku. I wasn't able to host the app Dockerized so I created another branch
 where I have a build script that builds the FE part, copies it to BE and then pushes the BE part to Heroku
 - The app (in production) uses mongodb hosted in [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-- docker-compose.yaml consists of three containers. One for BE, one for FE and one for MongoDB.
+- docker-compose.yaml consists of three containers (if you could say that). One for BE, one for FE and one for MongoDB.
 - The database consists of four collections: 
   - currencies: all the available currencies that the user can choose from.
   - fxrates: foreign exchange rates (in relation to the euro).
@@ -16,5 +16,4 @@ where I have a build script that builds the FE part, copies it to BE and then pu
   - users: information on users that did an exchange on the website. Consists of their IP and action.
 - The resources from [Lietuvos bankas](https://www.lb.lt/webservices/FxRates/) are re-fetched every night at 4AM
 (the dependency responsible for making that happen is node-scheduler)
-
 
